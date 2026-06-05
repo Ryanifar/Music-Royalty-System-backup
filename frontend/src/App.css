@@ -99,6 +99,50 @@ body {
   margin-right: auto;
 }
 
+.upload-section {
+  padding: 40px 10%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.upload-section h2 {
+  font-size: 30px;
+  margin-bottom: 24px;
+}
+
+.upload-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  max-width: 900px;
+}
+
+.upload-form input {
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.upload-form button {
+  grid-column: span 2;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 10px;
+  background: white;
+  color: #5b5fc7;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.upload-form button:hover {
+  opacity: 0.9;
+}
+
 .section-header h2 {
   font-size: 28px;
   font-weight: 600;
@@ -404,42 +448,5 @@ body {
   
   .btn-play, .btn-detail {
     padding: 10px;
-  }
-
-  .upload-section {
-  padding: 40px 10%;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  }
-
-  .upload-section h2 {
-    margin-bottom: 20px;
-  }
-
-  .upload-form {
-  display: grid;
-  gap: 15px;
-  max-width: 600px;
-  }
-
-  .upload-form input {
-  padding: 14px;
-  border: none;
-  border-radius: 10px;
-  font-size: 14px;
-  }
-
-  .upload-form button {
-  padding: 14px;
-  border: none;
-  border-radius: 10px;
-  background: white;
-  color: #5b5fc7;
-  font-weight: bold;
-  cursor: pointer;
-  }
-
-  .upload-form button:hover {
-    opacity: 0.9;
   }
 }

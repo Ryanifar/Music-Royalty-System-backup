@@ -17,71 +17,95 @@ function App() {
   const [account, setAccount] = useState("");
   
   const getReadContract = () => {
-  const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+    const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
 
-  return new ethers.Contract(
-    CONTRACT_ADDRESS,
-    MusicRoyaltyABI.abi,
-    provider
-  );
-};
+    return new ethers.Contract(
+      CONTRACT_ADDRESS,
+      MusicRoyaltyABI.abi,
+      provider
+    );
+  };
 
-const getWriteContract = async () => {
-  if (!window.ethereum) {
-    alert("MetaMask belum terinstall");
-    return null;
-  }
-
-  const provider = new ethers.BrowserProvider(window.ethereum);
-  const signer = await provider.getSigner();
-
-  return new ethers.Contract(
-    CONTRACT_ADDRESS,
-    MusicRoyaltyABI.abi,
-    signer
-  );
-};
-
-  const handleUploadSong = async (e) => {
-  e.preventDefault();
-
-  try {
-    if (!account) {
-      alert("Connect wallet terlebih dahulu");
-      return;
+  const getWriteContract = async () => {
+    if (!window.ethereum) {
+      alert("MetaMask belum terinstall");
+      return null;
     }
 
-    const contract = await getWriteContract();
-    if (!contract) return;
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
 
-    const wallets = [collaboratorWallet];
-    const percentages = [Number(percentage)];
-
-    const tx = await contract.uploadSong(
-      title,
-      artist,
-      metadataURI,
-      wallets,
-      percentages
+    return new ethers.Contract(
+      CONTRACT_ADDRESS,
+      MusicRoyaltyABI.abi,
+      signer
     );
+  };
 
-    alert("Transaksi upload lagu sedang diproses...");
-    await tx.wait();
+  const handleUploadSong = async (e) => {
+    e.preventDefault();
+    try {
+      if (!account) {
+        alert("Connect wallet terlebih dahulu");
+        return;
+      }
 
-    alert("Lagu berhasil diupload");
+      const contract = await getWriteContract();
+      if (!contract) return;
 
-    setTitle("");
-    setArtist("");
-    setMetadataURI("");
-    setCollaboratorWallet("");
-    setPercentage("");
+      const wallets = [collaboratorWallet];
+      const percentages = [Number(percentage)];
 
-    loadSongs();
-  } catch (error) {
-    console.error("Upload song error:", error);
-    alert("Gagal upload lagu. Pastikan total persentase = 100.");
-  }
-};
+      const tx = await contract.uploadSong(
+        title,
+        artist,
+        metadataURI,
+        wallets,
+        percentages
+      );
+
+      alert("Transaksi upload lagu sedang diproses...");
+      await tx.wait();
+
+      alert("Lagu berhasil diupload");
+
+      setTitle("");
+      setArtist("");
+      setMetadataURI("");
+      setCollaboratorWallet("");
+      setPercentage("");
+
+      loadSongs();
+    } 
+    catch (error) {
+      console.error("Upload song error:", error);
+      alert("Gagal upload lagu. Pastikan total persentase = 100.");
+    }
+  };
+
+    const handleClaimRoyalty = async () => {
+      try {
+        if (!account) {
+          alert("Connect wallet terlebih dahulu");
+          return;
+        }
+
+        const contract = await getWriteContract();
+        if (!contract) return;
+
+        const tx = await contract.claimRoyalty();
+
+        alert("Proses klaim royalti...");
+        await tx.wait();
+
+        alert("Royalti berhasil diklaim");
+        loadSongs();
+      } 
+      catch (error) {
+        console.error("Claim royalty error:", error);
+        alert("Gagal klaim royalti. Pastikan wallet memiliki saldo royalti.");
+      }
+    };
   
   // DATA SEMENTARA (mock data) - Nanti diganti dengan data dari smart contract
   const [songs, setSongs] = useState([]);
@@ -125,10 +149,11 @@ const getWriteContract = async () => {
 
     alert("Berhasil memutar lagu dan membayar royalti");
     loadSongs();
-  } catch (error) {
-    console.error("Play error:", error);
-    alert("Gagal play & pay");
-  }
+  } 
+    catch (error) {
+      console.error("Play error:", error);
+      alert("Gagal play & pay");
+    }
 };
 
   // Handle detail
@@ -148,19 +173,20 @@ const getWriteContract = async () => {
 
     alert(
       `Judul: ${song[1]}
-Artis: ${song[2]}
-Metadata: ${song[3]}
-Uploader: ${song[4]}
-Play Count: ${Number(song[5])}
-Total Royalty: ${ethers.formatEther(song[6])} ETH
+      Artis: ${song[2]}
+      Metadata: ${song[3]}
+      Uploader: ${song[4]}
+      Play Count: ${Number(song[5])}
+      Total Royalty: ${ethers.formatEther(song[6])} ETH
 
-Kolaborator:
-${collaboratorText}`
+      Kolaborator:
+      ${collaboratorText}`
     );
-  } catch (error) {
-    console.error("Detail error:", error);
-    alert("Gagal mengambil detail lagu");
-  }
+  } 
+    catch (error) {
+      console.error("Detail error:", error);
+      alert("Gagal mengambil detail lagu");
+    }
 };
 
   // Format alamat wallet (0x1234...5678)
@@ -235,54 +261,54 @@ useEffect(() => {
         )}
       </section>
 
-      {/* Daftar Lagu */}
+      {/* Upload Lagu */}
       <section className="upload-section">
-  <h2>Upload Lagu</h2>
+        <h2>Upload Lagu</h2>
 
-  <form onSubmit={handleUploadSong} className="upload-form">
-    <input
-      type="text"
-      placeholder="Judul lagu"
-      value={title}
-      onChange={(e) => setTitle(e.target.value)}
-      required
-    />
+        <form onSubmit={handleUploadSong} className="upload-form">
+          <input
+            type="text"
+            placeholder="Judul lagu"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
 
-    <input
-      type="text"
-      placeholder="Nama artis"
-      value={artist}
-      onChange={(e) => setArtist(e.target.value)}
-      required
-    />
+          <input
+            type="text"
+            placeholder="Nama artis"
+            value={artist}
+            onChange={(e) => setArtist(e.target.value)}
+            required
+          />
 
-    <input
-      type="text"
-      placeholder="Metadata URI / IPFS URL"
-      value={metadataURI}
-      onChange={(e) => setMetadataURI(e.target.value)}
-      required
-    />
+          <input
+            type="text"
+            placeholder="Metadata URI / IPFS URL"
+            value={metadataURI}
+            onChange={(e) => setMetadataURI(e.target.value)}
+            required
+          />
 
-    <input
-      type="text"
-      placeholder="Wallet kolaborator"
-      value={collaboratorWallet}
-      onChange={(e) => setCollaboratorWallet(e.target.value)}
-      required
-    />
+          <input
+            type="text"
+            placeholder="Wallet kolaborator"
+            value={collaboratorWallet}
+            onChange={(e) => setCollaboratorWallet(e.target.value)}
+            required
+          />
 
-    <input
-      type="number"
-      placeholder="Persentase royalti, contoh: 100"
-      value={percentage}
-      onChange={(e) => setPercentage(e.target.value)}
-      required
-    />
+          <input
+            type="number"
+            placeholder="Persentase royalti, contoh: 100"
+            value={percentage}
+            onChange={(e) => setPercentage(e.target.value)}
+            required
+          />
 
-    <button type="submit">Upload Song</button>
-  </form>
-</section>
+          <button type="submit">Upload Song</button>
+        </form>
+      </section>
       <div className="content-area">
         <div className="section-header">
           <h2>Registered Songs</h2>
@@ -302,7 +328,7 @@ useEffect(() => {
               <div className="song-stats">
                 <div className="stat">
                   <span className="stat-label">Plays</span>
-                  <span className="stat-value">{song.plays}</span>
+                  <span className="stat-value">{song.playCount}</span>
                 </div>
                 <div className="stat">
                   <span className="stat-label">Royalty</span>
@@ -324,7 +350,19 @@ useEffect(() => {
                 >
                   Details
                 </button>
+                <button 
+                  className="btn-detail"
+                  onClick={() => handleClaimRoyalty(song.id, song.title)}
+                >
+                  Claim Royalty
+                </button>
               </div>
+              {/* <button 
+                className="login-warning"
+                onClick={() => handleClaimRoyalty(song.id, song.title)}
+              >
+                Claim Royalty
+              </button> */}
               
               {!account && (
                 <p className="login-warning">Connect wallet first to play songs</p>
@@ -332,6 +370,7 @@ useEffect(() => {
             </div>
           ))}
         </div>
+        
       </div>
 
       {/* Footer */}
